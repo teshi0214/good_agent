@@ -81,3 +81,36 @@ gcloud services enable \
 gcloud storage buckets create gs://<BUCKET_NAME> --location=<REGION>
 
 python google_scholar_02/deploy.py --create
+
+
+
+	2.	ロール付与（プロジェクト）
+gcloud projects add-iam-policy-binding <PROJECT_ID> \
+  --member="serviceAccount:deploy-agent@<PROJECT_ID>.iam.gserviceaccount.com" \
+  --role="roles/aiplatform.admin"
+
+gcloud projects add-iam-policy-binding <PROJECT_ID> \
+  --member="serviceAccount:deploy-agent@<PROJECT_ID>.iam.gserviceaccount.com" \
+  --role="roles/logging.viewer"
+
+	3.	ロール付与（バケット）
+gcloud iam service-accounts keys create sa-key.json \
+  --iam-account=deploy-agent@<PROJECT_ID>.iam.gserviceaccount.com
+export GOOGLE_APPLICATION_CREDENTIALS="$PWD/sa-key.json"
+
+
+	4.	キーファイル発行（ローカル/CIで使う場合）
+gcloud iam service-accounts keys create sa-key.json \
+  --iam-account=deploy-agent@<PROJECT_ID>.iam.gserviceaccount.com
+export GOOGLE_APPLICATION_CREDENTIALS="$PWD/sa-key.json"
+
+	5.	デプロイ実行
+python google_scholar_02/deploy.py \
+  --create \
+  --project_id=<PROJECT_ID> \
+  --location=<REGION> \
+  --bucket=<BUCKET_NAME>
+
+
+
+
